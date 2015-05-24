@@ -8,48 +8,62 @@
 ## otherwise the inverse would need to be computed again.
 
 
+## to run the code, create a matrix:
+## k = matrix(c(1,2,3,4),nrow=2,ncol=2)
+
+## cacheSolve(makeCacheMatrix(k))
+
+
+
 ## This function creates the object m that will be the cache of the matrix
-makeCacheMatrix <- function(x = matrix()) {
-      ## Initialise m
-      m <- NULL
 
-      ## SET
-      set <- function(y) {
-          x <<- y
-          m <<- NULL
-      }
-
-      ## GET
-      get <- function() x
-
-      ## SET INVERSE
-      setinverse <- function(solve) m <<- solve
-
-      ## GET INVERSE
-      getinverse <- function() m
-      
-
+makeCacheMatrix <- function(x = numeric()) {
+  ## Initialise m
+  m <- NULL
+  
+  ## SET
+  set <- function(y) {
+    x <<- y
+    m <<- NULL
+  }
+  
+  ## GET
+  get <- function() x
+  
+  ## SET INVERSE
+  setsolve <- function(solve) m <<- solve
+  
+  ## GET INVERSE
+  getsolve <- function() m
+  
+  ## transfer
+  list(set = set, get = get,
+       setsolve = setsolve,
+       getsolve = getsolve)
+  
+  
 }
 
 
 ## This function will use the above function to get the cached matrix
-cacheSolve <- function(x, ...) {
-      ## Get the inverse matrix from in case it has already be prepared
-      m <- x$getinverse()
 
-      ## Test to see if NULL - if not then it is good to return the cached matrix
-      if(!is.null(m)){
-              ## and say that the cashed matrix is being use because
-              ## otherwise the user will not be able to tell the difference
-              message("Getting Cached Data")
-              return(m)
-      }
-      
-      ## If m was NULL, then make m the inverse of the matrix provided
-      data <- x$get()
-      m <- solve(data, ...)
-      x$setinverse(m)
-      
-      ## now return m
-      m
+cacheSolve <- function(x, ...) {
+  ## Get the inverse matrix from in case it has already be prepared
+  m <- x$getsolve()
+  
+  ## Test to see if NULL - if not then it is good to return the cached matrix
+  if(!is.null(m)){
+    ## and say that the cashed matrix is being use because
+    ## otherwise the user will not be able to tell the difference
+    message("Getting Cached Data")
+    return(m)
+  }
+  
+  ## If m was NULL, then make m the inverse of the matrix provided
+  data <- x$get()
+  m <- solve(data, ...)
+  x$setsolve(m)
+  
+  ## now return m
+  m
 }
